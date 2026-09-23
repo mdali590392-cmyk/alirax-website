@@ -3,29 +3,42 @@
 <head>
 <title>ALIRAX - Free API Keys</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Google ke liye special code - Isse Google pe aayegi -->
+<meta name="description" content="ALIRAX is a free API Key Generator for developers by Ali Khan. Generate your free ALIRAX API key instantly.">
+<meta name="keywords" content="ALIRAX, Ali Khan, Free API, API Key Generator, ALIRAX API">
+<meta name="author" content="Ali Khan Editer">
+<meta name="google-site-verification" content="google">
+
 <style>
-body { background: black; color: white; text-align: center; font-family: sans-serif; padding-top: 50px; }
-h1 { color: #00ff88; font-size: 40px; }
-button { background: #00ff88; color: black; padding: 15px 30px; font-size: 20px; border: none; border-radius: 10px; font-weight: bold; }
-#keyBox { margin-top: 30px; background: #222; padding: 20px; border-radius: 10px; word-break: break-all; display: none; }
+body { background: black; color: white; text-align: center; font-family: sans-serif; padding-top: 50px; margin: 0; }
+h1 { color: #00ff88; font-size: 45px; margin-bottom: 10px; }
+p { color: #aaa; }
+button { background: #00ff88; color: black; padding: 15px 35px; font-size: 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+#keyBox { margin: 30px auto; background: #1a1a1a; padding: 20px; border-radius: 12px; word-break: break-all; display: none; max-width: 90%; border: 1px solid #00ff88; }
 </style>
 </head>
 <body>
+
 <h1>ALIRAX</h1>
-<p>Free API Key Generator by Ali Khan</p>
+<p>Free API Key Generator by Ali Khan Editer</p>
 <button onclick="generateKey()">Generate My Key</button>
 <div id="keyBox"></div>
 
 <script>
 async function generateKey() {
-  document.getElementById('keyBox').style.display = 'block';
-  document.getElementById('keyBox').innerHTML = "Generating...";
-  
-  let response = await fetch('https://alirax-api.vercel.app/generate-key');
-  let data = await response.json();
-  
-  document.getElementById('keyBox').innerHTML = "Your Key:<br><br><b>" + data.api_key + "</b><br><br>Copy kar lo!";
+  let box = document.getElementById('keyBox');
+  box.style.display = 'block';
+  box.innerHTML = "Generating... Please wait...";
+  try {
+    let response = await fetch('https://alirax-api.vercel.app/generate-key');
+    let data = await response.json();
+    box.innerHTML = "✅ Your Key Generated:<br><br><b style='color:#00ff88; font-size:18px;'>" + data.api_key + "</b><br><br>Copy kar lo!";
+  } catch (e) {
+    box.innerHTML = "Error! API check karo.";
+  }
 }
 </script>
+
 </body>
 </html>
