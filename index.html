@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ALIRAX - Free API Keys</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { background: black; color: white; text-align: center; font-family: sans-serif; padding-top: 50px; }
+h1 { color: #00ff88; font-size: 40px; }
+button { background: #00ff88; color: black; padding: 15px 30px; font-size: 20px; border: none; border-radius: 10px; font-weight: bold; }
+#keyBox { margin-top: 30px; background: #222; padding: 20px; border-radius: 10px; word-break: break-all; display: none; }
+</style>
+</head>
+<body>
+<h1>ALIRAX</h1>
+<p>Free API Key Generator by Ali Khan</p>
+<button onclick="generateKey()">Generate My Key</button>
+<div id="keyBox"></div>
+
+<script>
+async function generateKey() {
+  document.getElementById('keyBox').style.display = 'block';
+  document.getElementById('keyBox').innerHTML = "Generating...";
+  
+  let response = await fetch('https://alirax-api.vercel.app/generate-key');
+  let data = await response.json();
+  
+  document.getElementById('keyBox').innerHTML = "Your Key:<br><br><b>" + data.api_key + "</b><br><br>Copy kar lo!";
+}
+</script>
+</body>
+</html>
