@@ -1,170 +1,351 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AliRax AI - Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AliRax AI — Autonomous Multi-Agent Neural Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
   <style>
-    body { font-family: 'Inter', sans-serif; background-color: #050507; color: #ffffff; }
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 10%, #0d121d 0%, #04060a 100%);
+      --liquid-cyan: rgba(0, 242, 254, 0.7);
+      --liquid-violet: rgba(138, 43, 226, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-bg: rgba(255, 255, 255, 0.03);
+      --text-main: #f0f4f8;
+      --text-sub: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: #04060a;
+      background-image: var(--bg-gradient);
+      min-height: 100vh;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: hidden;
+      padding: 20px 10px;
+    }
+
+    /* Ambient Liquid Orb Effects */
+    .liquid-orb-1 {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      top: -60px;
+      left: -60px;
+      background: radial-gradient(circle, var(--liquid-cyan) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(80px);
+      z-index: -1;
+      animation: floatOrb 12s infinite alternate ease-in-out;
+    }
+
+    .liquid-orb-2 {
+      position: absolute;
+      width: 350px;
+      height: 350px;
+      bottom: -80px;
+      right: -60px;
+      background: radial-gradient(circle, var(--liquid-violet) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(90px);
+      z-index: -1;
+      animation: floatOrb 15s infinite alternate ease-in-out reverse;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(40px, 50px) scale(1.15); }
+    }
+
+    /* Glass Container */
+    .container {
+      width: 100%;
+      max-width: 850px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 28px;
+      padding: 25px;
+      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      height: 85vh;
+      position: relative;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    .brand-info h1 {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: 0.5px;
+      background: linear-gradient(90deg, #ffffff, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-info p {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .status-badge {
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      background: rgba(0, 255, 157, 0.08);
+      border: 1px solid rgba(0, 255, 157, 0.3);
+      color: #00ff9d;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #00ff9d;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00ff9d;
+    }
+
+    /* Chat Messages Box */
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--glass-border) transparent;
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 14px 18px;
+      border-radius: 20px;
+      font-size: 14.5px;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-msg {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(0, 242, 254, 0.25) 0%, rgba(79, 172, 254, 0.2) 100%);
+      border: 1px solid rgba(0, 242, 254, 0.4);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .ai-msg {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      color: #e2e8f0;
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg-meta {
+      font-size: 10px;
+      color: var(--text-sub);
+      margin-top: 6px;
+      display: block;
+    }
+
+    /* Input Controls */
+    .input-wrapper {
+      position: relative;
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 16px 20px;
+      color: #fff;
+      font-size: 14.5px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .chat-input:focus {
+      border-color: rgba(0, 242, 254, 0.6);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+      border: none;
+      border-radius: 18px;
+      padding: 0 24px;
+      color: #000;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    .send-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 242, 254, 0.6);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-top: 15px;
+    }
+
+    footer span {
+      color: #00f2fe;
+    }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
+<body>
 
-  <!-- Header / Navbar -->
-  <header class="flex items-center justify-between border-b border-white/10 pb-4">
-    <div class="flex items-center gap-2">
-      <div class="h-8 w-8 rounded-full bg-[#CCFF00] flex items-center justify-center text-black font-bold text-lg">A</div>
-      <span class="text-xl font-bold tracking-wide">AliRax AI</span>
-    </div>
-    <button id="logoutBtn" onclick="logout()" class="text-xs px-3 py-1.5 rounded-lg border border-white/20 hover:bg-white/10 transition-all text-white/70">
-      Logout
-    </button>
-  </header>
+  <div class="liquid-orb-1"></div>
+  <div class="liquid-orb-2"></div>
 
-  <!-- Main Container -->
-  <main class="max-w-3xl w-full mx-auto my-auto py-10">
-    <div class="bg-[#0A0A0B] border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
-      
-      <!-- Top Glow Effect -->
-      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-24 bg-[#CCFF00]/10 blur-3xl pointer-events-none"></div>
-
-      <div class="mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">API Key Management</h1>
-        <p class="text-sm text-white/50 mt-1">Generate and manage your secret API key for AliRax AI access.</p>
-      </div>
-
-      <!-- Key Display Box -->
-      <div class="bg-black/60 border border-white/10 rounded-xl p-4 mb-6">
-        <label class="block text-xs uppercase tracking-widest text-white/40 mb-2 font-mono">Your Active Key</label>
-        <div class="flex items-center justify-between gap-3 bg-[#101010] p-3 rounded-lg border border-white/5">
-          <input type="text" id="apiKeyDisplay" readonly value="No key generated yet" class="bg-transparent text-sm font-mono text-[#CCFF00] w-full focus:outline-none truncate">
-          <button id="copyBtn" onclick="copyKey()" class="bg-white/10 hover:bg-white/20 text-xs px-3 py-1.5 rounded-md text-white transition-all">
-            Copy
-          </button>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="brand-logo">A</div>
+        <div class="brand-info">
+          <h1>AliRax AI</h1>
+          <p>Autonomous Multi-Agent Orchestrator</p>
         </div>
       </div>
-
-      <!-- Action Buttons -->
-      <div class="flex flex-col sm:flex-row gap-3">
-        <button id="genBtn" onclick="generateKey()" class="flex-1 bg-[#CCFF00] hover:bg-[#d4ff33] text-black font-semibold text-sm py-3 px-4 rounded-xl transition-all text-center">
-          ⚡ Generate New Key
-        </button>
-        <button id="revokeBtn" onclick="revokeKey()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-medium text-sm py-3 px-4 rounded-xl transition-all">
-          Revoke Key
-        </button>
+      <div class="status-badge">
+        <span class="status-dot"></span> Backend Active
       </div>
+    </header>
 
-      <!-- Status / Alert Message -->
-      <div id="statusMsg" class="mt-4 text-xs font-mono text-center hidden"></div>
+    <div class="chat-box" id="chatBox">
+      <div class="msg ai-msg">
+        Namaste! Main **AliRax AI** hu. Mujhe Bihar ke Vaishali jila ke Chhaurahi gaaon ke **Ali** ne banaya hai.<br><br>
+        Aap coding, video prompt ya koi bhi sawal pooch sakte hain!
+        <span class="msg-meta">AliRax Core Engine</span>
+      </div>
     </div>
-  </main>
 
-  <!-- Footer -->
-  <footer class="text-center text-xs text-white/30 border-t border-white/10 pt-4">
-    AliRax AI Engine &copy; 2026. Secure & Encrypted Dashboard.
+    <div class="input-wrapper">
+      <input type="text" id="userInput" class="chat-input" placeholder="Ask AliRax anything..." onkeydown="handleKey(event)">
+      <button class="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <footer>
+    Created with ❤️ by <span>Ali</span> (Chhaurahi, Vaishali, Bihar)
   </footer>
 
-  <!-- Client JavaScript Logic -->
   <script>
-    const token = localStorage.getItem('alirax_token');
+    const BACKEND_URL = "https://alirax.mdali590392.workers.dev/v1/chat/completions";
 
-    // Page Load Par Key Check Karo
-    window.onload = async () => {
-      if (!token) {
-        window.location.href = '/login.html';
-        return;
-      }
-      fetchCurrentKey();
-    };
+    function handleKey(e) {
+      if (e.key === 'Enter') sendMessage();
+    }
 
-    async function fetchCurrentKey() {
-      showStatus("Loading API key...", "text-white/50");
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatBox = document.getElementById("chatBox");
+      const text = input.value.trim();
+
+      if (!text) return;
+
+      // Append User Message
+      const userDiv = document.createElement("div");
+      userDiv.className = "msg user-msg";
+      userDiv.innerHTML = `${text}<span class="msg-meta">You</span>`;
+      chatBox.appendChild(userDiv);
+
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Append Loading AI Message
+      const aiDiv = document.createElement("div");
+      aiDiv.className = "msg ai-msg";
+      aiDiv.innerHTML = `<i>AliRax Orchestrator thinking...</i>`;
+      chatBox.appendChild(aiDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
       try {
-        const res = await fetch('/api/key/get', {
-          headers: { 'Authorization': `Bearer ${token}` }
+        const res = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer alirax-sk-testkey"
+          },
+          body: JSON.stringify({ prompt: text })
         });
+
         const data = await res.json();
         
-        if (res.ok && data.key) {
-          document.getElementById('apiKeyDisplay').value = data.key;
-          hideStatus();
+        if(data.response) {
+          aiDiv.innerHTML = `${data.response.replace(/\n/g, '<br>')}<span class="msg-meta">Intent: ${data.task_category || 'General'}</span>`;
         } else {
-          document.getElementById('apiKeyDisplay').value = "No key generated yet";
-          hideStatus();
+          aiDiv.innerHTML = `System Error: ${data.error || 'Unable to connect to backend'}`;
         }
+
       } catch (err) {
-        showStatus("Failed to fetch key from server", "text-red-400");
+        aiDiv.innerHTML = `Connection Error: Backend server unreachable.`;
       }
-    }
 
-    async function generateKey() {
-      showStatus("Generating key...", "text-white/50");
-      try {
-        const res = await fetch('/api/key/generate', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        if (res.ok) {
-          document.getElementById('apiKeyDisplay').value = data.key;
-          showStatus("New API Key generated successfully!", "text-[#CCFF00]");
-        } else {
-          showStatus(data.error || "Failed to generate key", "text-red-400");
-        }
-      } catch (err) {
-        showStatus("Error connecting to server", "text-red-400");
-      }
-    }
-
-    async function revokeKey() {
-      if(!confirm("Are you sure you want to revoke your API key?")) return;
-      showStatus("Revoking key...", "text-white/50");
-      try {
-        const res = await fetch('/api/key/revoke', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        
-        if (res.ok) {
-          document.getElementById('apiKeyDisplay').value = "No key generated yet";
-          showStatus("API Key revoked successfully!", "text-red-400");
-        } else {
-          showStatus("Failed to revoke key", "text-red-400");
-        }
-      } catch (err) {
-        showStatus("Error connecting to server", "text-red-400");
-      }
-    }
-
-    function copyKey() {
-      const keyVal = document.getElementById('apiKeyDisplay').value;
-      if (!keyVal || keyVal.includes("yet")) return;
-
-      navigator.clipboard.writeText(keyVal);
-      const copyBtn = document.getElementById('copyBtn');
-      copyBtn.innerText = "Copied!";
-      setTimeout(() => copyBtn.innerText = "Copy", 2000);
-    }
-
-    function logout() {
-      localStorage.removeItem('alirax_token');
-      window.location.href = '/login.html';
-    }
-
-    function showStatus(msg, colorClass) {
-      const el = document.getElementById('statusMsg');
-      el.className = `mt-4 text-xs font-mono text-center ${colorClass}`;
-      el.innerText = msg;
-      el.classList.remove('hidden');
-    }
-
-    function hideStatus() {
-      document.getElementById('statusMsg').classList.add('hidden');
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
   </script>
 </body>
 </html>
-
