@@ -25,7 +25,6 @@
             position: relative;
         }
 
-        /* Zero Gravity Floating Liquid Water Blobs */
         .liquid-orb {
             position: absolute;
             border-radius: 50%;
@@ -58,7 +57,6 @@
             100% { transform: translate(-40px, 40px) rotate(360deg) scale(0.9); }
         }
 
-        /* Glassmorphism Header */
         header {
             display: flex;
             justify-content: space-between;
@@ -96,7 +94,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 600;
             font-size: 14px;
-            letter-spacing: 0.5px;
         }
 
         .btn-glass:hover {
@@ -106,7 +103,6 @@
             transform: translateY(-2px);
         }
 
-        /* Main Container */
         .container {
             max-width: 950px;
             width: 90%;
@@ -164,7 +160,6 @@
             backdrop-filter: blur(15px);
         }
 
-        /* Input Glass Bar */
         .input-area {
             display: flex;
             padding: 20px;
@@ -182,13 +177,6 @@
             color: #fff;
             outline: none;
             font-size: 15px;
-            transition: all 0.3s ease;
-        }
-
-        .input-area input:focus {
-            border-color: #00f2fe;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
-            background: rgba(255, 255, 255, 0.07);
         }
 
         .send-btn {
@@ -199,15 +187,8 @@
             border-radius: 30px;
             cursor: pointer;
             font-weight: 700;
-            transition: all 0.3s ease;
         }
 
-        .send-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.5);
-        }
-
-        /* Modal Overlay */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -230,13 +211,6 @@
             max-width: 460px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
-        }
-
-        .modal h2 {
-            margin-bottom: 12px;
-            color: #00f2fe;
-            font-weight: 600;
         }
 
         .key-display {
@@ -267,8 +241,7 @@
     </header>
 
     <div class="container">
-        <div class="chat-box" id="chatBox">
-            </div>
+        <div class="chat-box" id="chatBox"></div>
 
         <div class="input-area">
             <input type="text" id="userInput" placeholder="Type a message..." onkeypress="handleEnter(event)">
@@ -292,6 +265,7 @@
         const BACKEND_URL = "https://alirax.mdali590392.workers.dev";
 
         function openKeyModal() {
+            document.getElementById('keyModal').display = 'flex';
             document.getElementById('keyModal').style.display = 'flex';
         }
 
@@ -299,6 +273,7 @@
             document.getElementById('keyModal').style.display = 'none';
         }
 
+        // Exact match with your backend POST endpoint
         async function createApiKey() {
             const keyBox = document.getElementById('keyResult');
             keyBox.innerText = "Generating token...";
@@ -312,7 +287,7 @@
                     keyBox.innerText = data.apiKey;
                     localStorage.setItem('alirax_key', data.apiKey);
                 } else {
-                    keyBox.innerText = "Error: Invalid response format.";
+                    keyBox.innerText = "Error: " + (data.error || "Key creation failed.");
                 }
             } catch(e) {
                 keyBox.innerText = "Error connecting to backend.";
@@ -334,14 +309,20 @@
             chatBox.innerHTML += `<div class="message ai-msg" id="${loadingId}">...</div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            let userKey = localStorage.getItem('alirax_key') || 'alirax-sk-default';
+            // Retrieve saved key created from button
+            let userKey = localStorage.getItem('alirax_key');
+
+            if(!userKey) {
+                document.getElementById(loadingId).innerText = "Error: Please generate an API Key first from top right menu!";
+                return;
+            }
 
             try {
                 const response = await fetch(`${BACKEND_URL}/v1/chat/completions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${userKey}`
+                        'Authorization': `Bearer ${userKey}` // Matches your backend auth check
                     },
                     body: JSON.stringify({ prompt: prompt })
                 });
