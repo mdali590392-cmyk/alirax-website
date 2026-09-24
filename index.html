@@ -1,44 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>ALIRAX - Free API Keys</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<!-- Google ke liye special code - Isse Google pe aayegi -->
-<meta name="description" content="ALIRAX is a free API Key Generator for developers by Ali Khan. Generate your free ALIRAX API key instantly.">
-<meta name="keywords" content="ALIRAX, Ali Khan, Free API, API Key Generator, ALIRAX API">
-<meta name="author" content="Ali Khan Editer">
-<meta name="google-site-verification" content="google">
-
-<style>
-body { background: black; color: white; text-align: center; font-family: sans-serif; padding-top: 50px; margin: 0; }
-h1 { color: #00ff88; font-size: 45px; margin-bottom: 10px; }
-p { color: #aaa; }
-button { background: #00ff88; color: black; padding: 15px 35px; font-size: 20px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-#keyBox { margin: 30px auto; background: #1a1a1a; padding: 20px; border-radius: 12px; word-break: break-all; display: none; max-width: 90%; border: 1px solid #00ff88; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AliRax AI - Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background-color: #050507; color: #ffffff; }
+  </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8">
 
-<h1>ALIRAX</h1>
-<p>Free API Key Generator by Ali Khan Editer</p>
-<button onclick="generateKey()">Generate My Key</button>
-<div id="keyBox"></div>
+  <!-- Header / Navbar -->
+  <header class="flex items-center justify-between border-b border-white/10 pb-4">
+    <div class="flex items-center gap-2">
+      <div class="h-8 w-8 rounded-full bg-[#CCFF00] flex items-center justify-center text-black font-bold text-lg">A</div>
+      <span class="text-xl font-bold tracking-wide">AliRax AI</span>
+    </div>
+    <button id="logoutBtn" onclick="logout()" class="text-xs px-3 py-1.5 rounded-lg border border-white/20 hover:bg-white/10 transition-all text-white/70">
+      Logout
+    </button>
+  </header>
 
-<script>
-async function generateKey() {
-  let box = document.getElementById('keyBox');
-  box.style.display = 'block';
-  box.innerHTML = "Generating... Please wait...";
-  try {
-    let response = await fetch('https://alirax-api.vercel.app/generate-key');
-    let data = await response.json();
-    box.innerHTML = "✅ Your Key Generated:<br><br><b style='color:#00ff88; font-size:18px;'>" + data.api_key + "</b><br><br>Copy kar lo!";
-  } catch (e) {
-    box.innerHTML = "Error! API check karo.";
-  }
-}
-</script>
+  <!-- Main Container -->
+  <main class="max-w-3xl w-full mx-auto my-auto py-10">
+    <div class="bg-[#0A0A0B] border border-white/10 rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      
+      <!-- Top Glow Effect -->
+      <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-72 h-24 bg-[#CCFF00]/10 blur-3xl pointer-events-none"></div>
 
+      <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight">API Key Management</h1>
+        <p class="text-sm text-white/50 mt-1">Generate and manage your secret API key for AliRax AI access.</p>
+      </div>
+
+      <!-- Key Display Box -->
+      <div class="bg-black/60 border border-white/10 rounded-xl p-4 mb-6">
+        <label class="block text-xs uppercase tracking-widest text-white/40 mb-2 font-mono">Your Active Key</label>
+        <div class="flex items-center justify-between gap-3 bg-[#101010] p-3 rounded-lg border border-white/5">
+          <input type="text" id="apiKeyDisplay" readonly value="No key generated yet" class="bg-transparent text-sm font-mono text-[#CCFF00] w-full focus:outline-none truncate">
+          <button id="copyBtn" onclick="copyKey()" class="bg-white/10 hover:bg-white/20 text-xs px-3 py-1.5 rounded-md text-white transition-all">
+            Copy
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row gap-3">
+        <button id="genBtn" onclick="generateKey()" class="flex-1 bg-[#CCFF00] hover:bg-[#d4ff33] text-black font-semibold text-sm py-3 px-4 rounded-xl transition-all text-center">
+          ⚡ Generate New Key
+        </button>
+        <button id="revokeBtn" onclick="revokeKey()" class="bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 font-medium text-sm py-3 px-4 rounded-xl transition-all">
+          Revoke Key
+        </button>
+      </div>
+
+      <!-- Status / Alert Message -->
+      <div id="statusMsg" class="mt-4 text-xs font-mono text-center hidden"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-xs text-white/30 border-t border-white/10 pt-4">
+    AliRax AI Engine &copy; 2026. Secure & Encrypted Dashboard.
+  </footer>
+
+  <!-- Client JavaScript Logic -->
+  <script>
+    const token = localStorage.getItem('alirax_token');
+
+    // Page Load Par Key Check Karo
+    window.onload = async () => {
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+      fetchCurrentKey();
+    };
+
+    async function fetchCurrentKey() {
+      showStatus("Loading API key...", "text-white/50");
+      try {
+        const res = await fetch('/api/key/get', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.key) {
+          document.getElementById('apiKeyDisplay').value = data.key;
+          hideStatus();
+        } else {
+          document.getElementById('apiKeyDisplay').value = "No key generated yet";
+          hideStatus();
+        }
+      } catch (err) {
+        showStatus("Failed to fetch key from server", "text-red-400");
+      }
+    }
+
+    async function generateKey() {
+      showStatus("Generating key...", "text-white/50");
+      try {
+        const res = await fetch('/api/key/generate', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+          document.getElementById('apiKeyDisplay').value = data.key;
+          showStatus("New API Key generated successfully!", "text-[#CCFF00]");
+        } else {
+          showStatus(data.error || "Failed to generate key", "text-red-400");
+        }
+      } catch (err) {
+        showStatus("Error connecting to server", "text-red-400");
+      }
+    }
+
+    async function revokeKey() {
+      if(!confirm("Are you sure you want to revoke your API key?")) return;
+      showStatus("Revoking key...", "text-white/50");
+      try {
+        const res = await fetch('/api/key/revoke', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+          document.getElementById('apiKeyDisplay').value = "No key generated yet";
+          showStatus("API Key revoked successfully!", "text-red-400");
+        } else {
+          showStatus("Failed to revoke key", "text-red-400");
+        }
+      } catch (err) {
+        showStatus("Error connecting to server", "text-red-400");
+      }
+    }
+
+    function copyKey() {
+      const keyVal = document.getElementById('apiKeyDisplay').value;
+      if (!keyVal || keyVal.includes("yet")) return;
+
+      navigator.clipboard.writeText(keyVal);
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.innerText = "Copied!";
+      setTimeout(() => copyBtn.innerText = "Copy", 2000);
+    }
+
+    function logout() {
+      localStorage.removeItem('alirax_token');
+      window.location.href = '/login.html';
+    }
+
+    function showStatus(msg, colorClass) {
+      const el = document.getElementById('statusMsg');
+      el.className = `mt-4 text-xs font-mono text-center ${colorClass}`;
+      el.innerText = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideStatus() {
+      document.getElementById('statusMsg').classList.add('hidden');
+    }
+  </script>
 </body>
 </html>
